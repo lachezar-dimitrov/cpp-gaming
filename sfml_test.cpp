@@ -22,6 +22,29 @@ int main()
     sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
     sf::RenderWindow window(sf::VideoMode({1024, 768}, desktop.bitsPerPixel), "SFML Keyboard Interaction");
 
+    sf::Font font("arial.ttf");
+    sf::Text text(font);
+    text.setString("Hello world");
+    text.setCharacterSize(24); // in pixels, not points!
+    text.setFillColor(sf::Color::Red);
+    text.setPosition(sf::Vector2f(350.0f, 10.0f));
+    // text.setStyle(sf::Text::Bold | sf::Text::Underlined);
+
+    // Implement camera movement
+    // 1. If the object goes left or fight of the screen we should move the camera with it
+    // 2. The ground should be large
+    // 3. The ground should be infinite
+
+    // Implement gravity
+    // 1. Find a way to change the text in the text object
+    // 2. Display the speed of the object while moving it
+    // 3. Make the object move on its own
+    // 4. Make the object to accelerate
+    // 5. Accelerate with the gravity
+
+    // Implement Jump
+    // 1. Disable gravity while jumping
+
     sf::CircleShape player(50);
     player.setFillColor(sf::Color::Yellow);
     player.setPosition(sf::Vector2f(375.0f, 275.0f));
@@ -60,6 +83,9 @@ int main()
             offset.y += 0.5f;
         }
 
+        // Gravity
+        offset.y += 0.1f;
+
         player.move(offset);
 
         if (ground.getGlobalBounds().findIntersection(player.getGlobalBounds()))
@@ -81,6 +107,7 @@ int main()
 
         window.clear(sf::Color::Blue);
 
+        window.draw(text);
         window.draw(player);
         window.draw(ground);
 
