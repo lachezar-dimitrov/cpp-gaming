@@ -24,11 +24,14 @@ void logCollision(sf::Vector2f firstObject, sf::Vector2f secondObject)
               << "enemy: Y - " << secondObject.y << std::endl;
 }
 
-bool hasCollision(sf::FloatRect mainObject, sf::FloatRect collidble)
+bool hasCollision(sf::FloatRect mainObject, const std::vector<sf::FloatRect> &collidables)
 {
-    if (mainObject.findIntersection(collidble))
+    for (const auto &collidable : collidables)
     {
-        return true;
+        if (mainObject.findIntersection(collidable))
+        {
+            return true;
+        }
     }
 
     return false;
@@ -85,6 +88,10 @@ int main()
     obstacle_2.setFillColor(sf::Color::Magenta);
     obstacle_2.setPosition(sf::Vector2f(1000.0f, 300.0f));
 
+    sf::RectangleShape obstacle_3(sf::Vector2f(400.0f, 200.0f));
+    obstacle_3.setFillColor(sf::Color::Magenta);
+    obstacle_3.setPosition(sf::Vector2f(1500.0f, 200.0f));
+
     while (window.isOpen())
     {
         while (std::optional<sf::Event> eventOpt = window.pollEvent())
@@ -114,7 +121,7 @@ int main()
             offset.y += 0.3f;
         }
 
-        offset.y += 0.1f;
+        offset.y += 0.2f;
 
         sf::Vector2f originalPosition = player.getPosition();
         sf::Vector2f originalViewCenter = gameView.getCenter();
@@ -122,9 +129,14 @@ int main()
         player.move(sf::Vector2f(offset.x, 0));
         gameView.move(sf::Vector2f(offset.x, 0));
 
-        if (hasCollision(player.getGlobalBounds(), ground.getGlobalBounds()) ||
-            hasCollision(player.getGlobalBounds(), obstacle_1.getGlobalBounds()) ||
-            hasCollision(player.getGlobalBounds(), obstacle_2.getGlobalBounds()))
+        std::vector<sf::FloatRect> collidables = {
+            ground.getGlobalBounds(),
+            obstacle_1.getGlobalBounds(),
+            obstacle_2.getGlobalBounds(),
+            obstacle_3.getGlobalBounds(),
+        };
+
+        if (hasCollision(player.getGlobalBounds(), collidables))
         {
             player.setPosition(sf::Vector2f(originalPosition.x, player.getPosition().y));
             gameView.setCenter(sf::Vector2f(originalViewCenter.x, gameView.getCenter().y));
@@ -133,9 +145,7 @@ int main()
         player.move(sf::Vector2f(0, offset.y));
         gameView.move(sf::Vector2f(0, offset.y));
 
-        if (hasCollision(player.getGlobalBounds(), ground.getGlobalBounds()) ||
-            hasCollision(player.getGlobalBounds(), obstacle_1.getGlobalBounds()) ||
-            hasCollision(player.getGlobalBounds(), obstacle_2.getGlobalBounds()))
+        if (hasCollision(player.getGlobalBounds(), collidables))
         {
             player.setPosition(sf::Vector2f(player.getPosition().x, originalPosition.y));
             gameView.setCenter(sf::Vector2f(gameView.getCenter().x, originalViewCenter.y));
@@ -147,6 +157,7 @@ int main()
         window.draw(player);
         window.draw(obstacle_1);
         window.draw(obstacle_2);
+        window.draw(obstacle_3);
         window.draw(ground);
         window.display();
     }
