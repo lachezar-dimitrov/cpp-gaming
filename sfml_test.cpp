@@ -39,6 +39,8 @@ bool hasCollision(sf::FloatRect mainObject, sf::FloatRect collidble)
 // 2. The ground should be large
 // 3. The ground should be infinite
 
+// Move the object if it is on the ground
+
 // Implement gravity
 // [V] 1. Make the object move on its own
 // 2. Find a way to change the text in the text object
@@ -59,10 +61,6 @@ int main()
     sf::RenderWindow window(sf::VideoMode({1024, 768}, desktop.bitsPerPixel), "SFML Keyboard Interaction");
 
     sf::View gameView(sf::FloatRect({0.f, 0.f}, {1024.0f, 768.0f}));
-    // gameView.setViewport(sf::FloatRect({0.f, 0.f}, {1.f, 1.f}));
-
-    // sf::View minimapView(sf::FloatRect({0.f, 0.f}, {1000.f, 600.f}));
-    // minimapView.setViewport(sf::FloatRect({0.75f, 0.f}, {0.25f, 0.25f}));
 
     sf::Font font("arial.ttf");
     sf::Text text(font);
@@ -75,7 +73,7 @@ int main()
     player.setFillColor(sf::Color::Yellow);
     player.setPosition(sf::Vector2f(375.0f, 275.0f));
 
-    sf::RectangleShape ground(sf::Vector2f(1000.0f, 100.0f));
+    sf::RectangleShape ground(sf::Vector2f(2000.0f, 100.0f));
     ground.setFillColor(sf::Color::Green);
     ground.setPosition(sf::Vector2f(0.0f, 700.0f));
 
@@ -95,79 +93,62 @@ int main()
             {
                 window.close();
             }
-
-            // if (const auto* resized = event->getIf<sf::Event::Resized>())
-            // {
-            //     // update the view to the new size of the window
-            //     sf::FloatRect visibleArea({0.f, 0.f}, sf::Vector2f(resized->size));
-            //     window.setView(sf::View(visibleArea));
-            // }
         }
 
-        // User input
         sf::Vector2f offset(0.0f, 0.0f);
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A) || sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left))
         {
-            offset.x -= 0.3f;
+            offset.x -= 0.2f;
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D) || sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right))
         {
-            offset.x += 0.3f;
+            offset.x += 0.2f;
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W) || sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up))
         {
-            offset.y -= 0.5f;
+            offset.y -= 0.3f;
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S) || sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down))
         {
-            offset.y += 0.5f;
+            offset.y += 0.3f;
         }
 
-        // if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::T))
-        // {
-        //     gameView.zoom(0.9f);
-        // }
-        // if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Y))
-        // {
-        //     gameView.zoom(1.1f);
-        // }
-        // User input
-
-        // Move the view slowly
-        gameView.move(sf::Vector2f(0.01f, 0.0f));
-
-        // Gravity
         offset.y += 0.1f;
-        // Gravity
 
-        // Collision detection
         sf::Vector2f originalPosition = player.getPosition();
+        sf::Vector2f originalViewCenter = gameView.getCenter();
 
-        player.move(offset);
+        player.move(sf::Vector2f(offset.x, 0));
+        gameView.move(sf::Vector2f(offset.x, 0));
 
-        if (hasCollision(player.getGlobalBounds(), ground.getGlobalBounds()) || hasCollision(player.getGlobalBounds(), obstacle_1.getGlobalBounds()) || hasCollision(player.getGlobalBounds(), obstacle_2.getGlobalBounds()))
+        if (hasCollision(player.getGlobalBounds(), ground.getGlobalBounds()) ||
+            hasCollision(player.getGlobalBounds(), obstacle_1.getGlobalBounds()) ||
+            hasCollision(player.getGlobalBounds(), obstacle_2.getGlobalBounds()))
         {
-            logCollision(player.getGlobalBounds().position, ground.getGlobalBounds().position);
-
-            player.setPosition(originalPosition);
+            player.setPosition(sf::Vector2f(originalPosition.x, player.getPosition().y));
+            gameView.setCenter(sf::Vector2f(originalViewCenter.x, gameView.getCenter().y));
         }
-        // Collision detection
 
-        // Rendering
+        player.move(sf::Vector2f(0, offset.y));
+        gameView.move(sf::Vector2f(0, offset.y));
+
+        if (hasCollision(player.getGlobalBounds(), ground.getGlobalBounds()) ||
+            hasCollision(player.getGlobalBounds(), obstacle_1.getGlobalBounds()) ||
+            hasCollision(player.getGlobalBounds(), obstacle_2.getGlobalBounds()))
+        {
+            player.setPosition(sf::Vector2f(player.getPosition().x, originalPosition.y));
+            gameView.setCenter(sf::Vector2f(gameView.getCenter().x, originalViewCenter.y));
+        }
+
         window.clear(sf::Color::Blue);
-
-        // window.setView(minimapView);
         window.setView(gameView);
-
         window.draw(text);
         window.draw(player);
         window.draw(obstacle_1);
         window.draw(obstacle_2);
         window.draw(ground);
-
         window.display();
-        // Rendering
     }
 
     return 0;
