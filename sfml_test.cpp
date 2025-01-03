@@ -46,6 +46,8 @@ bool hasCollision(sf::FloatRect mainObject, sf::FloatRect collidble)
 // 4. Make the object to accelerate
 // 5. Accelerate with the gravity
 
+// Implement bounce
+
 // Implement Jump
 // [V] 1. Disable gravity while jumping
 
@@ -56,25 +58,34 @@ int main()
     sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
     sf::RenderWindow window(sf::VideoMode({1024, 768}, desktop.bitsPerPixel), "SFML Keyboard Interaction");
 
+    sf::View gameView(sf::FloatRect({0.f, 0.f}, {1024.0f, 768.0f}));
+    // gameView.setViewport(sf::FloatRect({0.f, 0.f}, {1.f, 1.f}));
+
+    // sf::View minimapView(sf::FloatRect({0.f, 0.f}, {1000.f, 600.f}));
+    // minimapView.setViewport(sf::FloatRect({0.75f, 0.f}, {0.25f, 0.25f}));
+
     sf::Font font("arial.ttf");
     sf::Text text(font);
     text.setString("Stats: ");
     text.setCharacterSize(24); // in pixels, not points!
     text.setFillColor(sf::Color::Red);
     text.setPosition(sf::Vector2f(350.0f, 10.0f));
-    // text.setStyle(sf::Text::Bold | sf::Text::Underlined);
 
-    sf::CircleShape player(50);
+    sf::CircleShape player(40);
     player.setFillColor(sf::Color::Yellow);
     player.setPosition(sf::Vector2f(375.0f, 275.0f));
 
-    sf::RectangleShape ground(sf::Vector2f(700.0f, 100.0f));
+    sf::RectangleShape ground(sf::Vector2f(1000.0f, 100.0f));
     ground.setFillColor(sf::Color::Green);
     ground.setPosition(sf::Vector2f(0.0f, 700.0f));
 
-    sf::RectangleShape obstacle(sf::Vector2f(200.0f, 100.0f));
-    obstacle.setFillColor(sf::Color::Magenta);
-    obstacle.setPosition(sf::Vector2f(600.0f, 400.0f));
+    sf::RectangleShape obstacle_1(sf::Vector2f(200.0f, 100.0f));
+    obstacle_1.setFillColor(sf::Color::Magenta);
+    obstacle_1.setPosition(sf::Vector2f(600.0f, 400.0f));
+
+    sf::RectangleShape obstacle_2(sf::Vector2f(200.0f, 100.0f));
+    obstacle_2.setFillColor(sf::Color::Magenta);
+    obstacle_2.setPosition(sf::Vector2f(1000.0f, 300.0f));
 
     while (window.isOpen())
     {
@@ -84,6 +95,13 @@ int main()
             {
                 window.close();
             }
+
+            // if (const auto* resized = event->getIf<sf::Event::Resized>())
+            // {
+            //     // update the view to the new size of the window
+            //     sf::FloatRect visibleArea({0.f, 0.f}, sf::Vector2f(resized->size));
+            //     window.setView(sf::View(visibleArea));
+            // }
         }
 
         // User input
@@ -105,7 +123,19 @@ int main()
         {
             offset.y += 0.5f;
         }
+
+        // if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::T))
+        // {
+        //     gameView.zoom(0.9f);
+        // }
+        // if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Y))
+        // {
+        //     gameView.zoom(1.1f);
+        // }
         // User input
+
+        // Move the view slowly
+        gameView.move(sf::Vector2f(0.01f, 0.0f));
 
         // Gravity
         offset.y += 0.1f;
@@ -116,7 +146,7 @@ int main()
 
         player.move(offset);
 
-        if (hasCollision(player.getGlobalBounds(), ground.getGlobalBounds()) || hasCollision(player.getGlobalBounds(), obstacle.getGlobalBounds()))
+        if (hasCollision(player.getGlobalBounds(), ground.getGlobalBounds()) || hasCollision(player.getGlobalBounds(), obstacle_1.getGlobalBounds()) || hasCollision(player.getGlobalBounds(), obstacle_2.getGlobalBounds()))
         {
             logCollision(player.getGlobalBounds().position, ground.getGlobalBounds().position);
 
@@ -127,9 +157,13 @@ int main()
         // Rendering
         window.clear(sf::Color::Blue);
 
+        // window.setView(minimapView);
+        window.setView(gameView);
+
         window.draw(text);
         window.draw(player);
-        window.draw(obstacle);
+        window.draw(obstacle_1);
+        window.draw(obstacle_2);
         window.draw(ground);
 
         window.display();
