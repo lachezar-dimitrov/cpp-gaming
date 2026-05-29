@@ -30,3 +30,17 @@
 *.exe
 *.out
 *.app
+sfml_test
+cpp_gaming
+
+# Build directories
+build/
+cmake-build-*/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+compile_commands.json
+
+# Editor state
+.vscode/
+.DS_Store

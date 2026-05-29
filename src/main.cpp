@@ -37,25 +37,6 @@ bool hasCollision(sf::FloatRect mainObject, const std::vector<sf::FloatRect> &co
     return false;
 }
 
-// Implement camera movement
-// 1. If the object goes left or fight of the screen we should move the camera with it
-// 2. The ground should be large
-// 3. The ground should be infinite
-
-// Move the object if it is on the ground
-
-// Implement gravity
-// [V] 1. Make the object move on its own
-// 2. Find a way to change the text in the text object
-// 3. Display the speed of the object while moving it
-// 4. Make the object to accelerate
-// 5. Accelerate with the gravity
-
-// Implement bounce
-
-// Implement Jump
-// [V] 1. Disable gravity while jumping
-
 int main()
 {
     logScreenModes();
@@ -65,7 +46,7 @@ int main()
 
     sf::View gameView(sf::FloatRect({0.f, 0.f}, {1024.0f, 768.0f}));
 
-    sf::Font font("arial.ttf");
+    sf::Font font("assets/fonts/arial.ttf");
     sf::Text text(font);
     text.setString("Stats: ");
     text.setCharacterSize(24); // in pixels, not points!
